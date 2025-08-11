@@ -653,12 +653,12 @@ automatic help when idle for more than this amount of time."
         (progn
           (define-key map  "^"         #'cdlatex-sub-superscript)
           (define-key map  "_"         #'cdlatex-sub-superscript)))
-    
+
     (define-key map  "\t"        #'cdlatex-tab)
     (define-key map  "\C-c?"     #'cdlatex-command-help)
     (define-key map  "\C-c{"     #'cdlatex-environment)
     (define-key map  [(control return)] #'cdlatex-item)
-    
+
     (define-key map (cdlatex-get-kbd-vector cdlatex-math-symbol-prefix)
       #'cdlatex-math-symbol)
     (define-key map (cdlatex-get-kbd-vector cdlatex-math-modify-prefix)
@@ -822,40 +822,40 @@ Elements of KEEP-LIST are not removed even if duplicate."
       (backward-char 2))))
 
 (defun cdlatex-dollar (&optional arg)
-  "Insert a pair of dollars unless number of backslashes before point is odd.
-With ARG, insert pair of double dollars."
-  (interactive "P")
-  (cond
-   ((region-active-p)
-    (let ((s (region-beginning)) (e (region-end)))
-      (goto-char s)
-      (insert "$")
-      (goto-char (1+ e))
-      (insert "$")))
-   ((cdlatex-number-of-backslashes-is-odd)
-    (insert "$"))
-   ((cdlatex--texmathp)
-    (defvar texmathp-why)
-    (if (and (stringp (car texmathp-why))
-             (equal (substring (car texmathp-why) 0 1) "$"))
-        (progn
-          (insert (car texmathp-why))
-          (save-excursion
-            (goto-char (cdr texmathp-why))
-            (if (pos-visible-in-window-p)
-                (sit-for 1))))
-      (message "No dollars inside a math environment!")
-      (ding)))
-   ((and (stringp cdlatex-paired-parens)
-         (string-match "\\$" cdlatex-paired-parens))
-    (if arg
-        (if (bolp)
-            (progn (insert "$$\n\n$$\n") (backward-char 4))
-          (insert "$$  $$") (backward-char 3))
-      (insert "$$") (backward-char 1)))
-   (arg
-    (if (bolp) (insert "$$\n") (insert "$$")))
-   (t (insert "$"))))
+    "Insert a pair of dollars unless number of backslashes before point is odd.
+ With ARG, insert \\[...\\] instead."
+    (interactive "P")
+    (cond
+     ((region-active-p)
+      (let ((s (region-beginning)) (e (region-end)))
+	(goto-char s)
+	(insert "$")
+	(goto-char (1+ e))
+	(insert "$")))
+     ((cdlatex-number-of-backslashes-is-odd)
+      (insert "$"))
+     ((cdlatex--texmathp)
+      (defvar texmathp-why)
+      (if (and (stringp (car texmathp-why))
+               (equal (substring (car texmathp-why) 0 1) "$"))
+          (progn
+            (insert (car texmathp-why))
+            (save-excursion
+              (goto-char (cdr texmathp-why))
+              (if (pos-visible-in-window-p)
+                  (sit-for 1))))
+	(message "No dollars inside a math environment!")
+	(ding)))
+     ((and (stringp cdlatex-paired-parens)
+           (string-match "\\$" cdlatex-paired-parens))
+      (if arg
+          (if (bolp)
+              (progn (insert "\\[\n\n\\]") (backward-char 3) (LaTeX-indent-line))
+            (insert "\\[  \\]") (backward-char 3))
+	(insert "$$") (backward-char 1)))
+     (arg
+      (if (bolp) (insert "\\[\n") (insert "\\[")))
+     (t (insert "$"))))
 
 (defun cdlatex-sub-superscript ()
   "Insert ^{} or _{} unless the number of backslashes before point is odd.
