@@ -1056,7 +1056,7 @@ With a non-nil ARG, or a prefix argument, run texdoc instead."
 (defvar cdlatex-env-alist-comb nil)
 
 (defun cdlatex-environment (&optional environment item)
-  "Complete the name of an ENVIRONMENT and insert it.
+  "Complete the name of an ENVIRONMENT and insert it with indentation.
 If the environment is not found in the list, a \\begin \\end pair is
 inserted.  Any keywords AUTOLABEL will be replaced by an automatic label
 statement.  Any keywords AUTOFILE will prompt the user for a file name
@@ -1113,6 +1113,9 @@ the template.  This is mainly useful for \"items\" of environments, where
             (beginning-of-line 1)
             (if (looking-at "[ \t]*\n")
                 (kill-line 1)))))
+
+      ;; Apply indentation
+      (indent-region begpos endmarker)
 
       ;; Position cursor at the first question-mark
       (goto-char begpos)
