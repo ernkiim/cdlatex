@@ -323,7 +323,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;;;;;
-
 ;;; Code:
 
 (eval-when-compile (require 'cl-lib))
@@ -821,6 +820,8 @@ Elements of KEEP-LIST are not removed even if duplicate."
       (insert "\\(\\)")
       (backward-char 2))))
 
+
+
 (defun cdlatex-dollar (&optional arg)
     "Insert a pair of dollars unless number of backslashes before point is odd.
  With ARG, insert \\[...\\] instead."
@@ -849,12 +850,20 @@ Elements of KEEP-LIST are not removed even if duplicate."
      ((and (stringp cdlatex-paired-parens)
            (string-match "\\$" cdlatex-paired-parens))
       (if arg
-          (if (bolp)
-              (progn (insert "\\[\n\n\\]") (backward-char 3) (LaTeX-indent-line))
+          (if (= (current-indentation)
+                 (- (line-end-position) (line-beginning-position)))
+              (let ((start (point)))
+                (insert "\\[\n?\n\\]")
+                (indent-region start (point))
+                (search-backward "?")
+                (delete-char 1))
             (insert "\\[  \\]") (backward-char 3))
 	(insert "$$") (backward-char 1)))
      (arg
-      (if (bolp) (insert "\\[\n") (insert "\\[")))
+      (if (/= (current-indentation)
+             (- (line-end-position) (line-beginning-position)))
+          (insert "\\[")
+        (insert "\\[\n")))
      (t (insert "$"))))
 
 (defun cdlatex-sub-superscript ()
