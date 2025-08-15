@@ -744,9 +744,9 @@ Entering `cdlatex-mode' calls the hook cdlatex-mode-hook."
 
 ;; TODO
 (defun cdlatex-bolp-indentation ()
-  "Non-nil if cursor is at beginning of indentation"
+  "Non-nil if Point is at beginning of line, not counting indentation"
   (= (current-indentation)
-     (- (line-end-position) (line-beginning-position))))
+     (- (point) (line-beginning-position))))
 
 (defun cdlatex-dollars-balanced-to-here (&optional from)
   "Non-nil if the dollars are balanced between start of paragraph and point.
@@ -1003,10 +1003,14 @@ Sounds strange?  Try it out!"
       (cond
        ((= (following-char) ?\ )
         ;; stop at first space or b-o-l
-        (if (not (cdlatex-bolp-indentation)) (forward-char 1)) (throw 'stop t))
+        (if (bolp)
+            (funcall indent-line-function)
+          (message "here")
+          (forward-char 1))
+        (throw 'stop t))
        ((= (following-char) ?\n)
         ;; stop at line end, but not after \\
-        (if (and (cdlatex-bolp-indentation) (not (eobp)))
+        (if (and (bolp) (not (eobp)))
             (throw 'stop t)
           (if (equal "\\\\" (buffer-substring-no-properties
                              (- (point) 2) (point)))
