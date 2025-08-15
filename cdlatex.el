@@ -742,6 +742,12 @@ Entering `cdlatex-mode' calls the hook cdlatex-mode-hook."
 ;;;
 ;;; Functions that check out the surroundings
 
+;; TODO
+(defun cdlatex-bolp-indentation ()
+  "Non-nil if cursor is at beginning of indentation"
+  (= (current-indentation)
+     (- (line-end-position) (line-beginning-position))))
+
 (defun cdlatex-dollars-balanced-to-here (&optional from)
   "Non-nil if the dollars are balanced between start of paragraph and point.
 Unless the optional argument FROM specifies the position from
@@ -850,8 +856,7 @@ Elements of KEEP-LIST are not removed even if duplicate."
      ((and (stringp cdlatex-paired-parens)
            (string-match "\\$" cdlatex-paired-parens))
       (if arg
-          (if (= (current-indentation)
-                 (- (line-end-position) (line-beginning-position)))
+          (if (cdlatex-bolp-indentation)
               (let ((start (point)))
                 (insert "\\[\n?\n\\]")
                 (indent-region start (point))
@@ -860,10 +865,9 @@ Elements of KEEP-LIST are not removed even if duplicate."
             (insert "\\[  \\]") (backward-char 3))
 	(insert "$$") (backward-char 1)))
      (arg
-      (if (/= (current-indentation)
-             (- (line-end-position) (line-beginning-position)))
-          (insert "\\[")
-        (insert "\\[\n")))
+      (if (cdlatex-bolp-indentation)
+          (insert "\\[\n")
+        (insert "\\[")))
      (t (insert "$"))))
 
 (defun cdlatex-sub-superscript ()
@@ -999,10 +1003,10 @@ Sounds strange?  Try it out!"
       (cond
        ((= (following-char) ?\ )
         ;; stop at first space or b-o-l
-        (if (not (bolp)) (forward-char 1)) (throw 'stop t))
+        (if (not (cdlatex-bolp-indentation)) (forward-char 1)) (throw 'stop t))
        ((= (following-char) ?\n)
         ;; stop at line end, but not after \\
-        (if (and (bolp) (not (eobp)))
+        (if (and (cdlatex-bolp-indentation) (not (eobp)))
             (throw 'stop t)
           (if (equal "\\\\" (buffer-substring-no-properties
                              (- (point) 2) (point)))
