@@ -1609,6 +1609,12 @@ zZ
      "\\left\\{ \n\\begin{array}{l@{\\quad:\\quad}l}\n? & \\\\\n & \n\\end{array}\\right." cdlatex-position-cursor nil nil t)
     ("fr"         "Insert \\frac{}{}"
      "\\frac{?}{}"           cdlatex-position-cursor nil nil t)
+    ("inf"        "Insert \\infer{}{}"
+     "\\infer{?}{}"          cdlatex-position-cursor nil t t)
+    ("inf*"        "Insert \\infer*{}{}"
+     "\\infer*{?}{}"          cdlatex-position-cursor nil t t)
+    ("inf="        "Insert \\infer={}{}"
+     "\\infer={?}{}"          cdlatex-position-cursor nil t t)
     ("sq"         "Insert \\sqrt{}"
      "\\sqrt{?}"             cdlatex-position-cursor nil nil t)
     ("intl"       "Insert \\int\\limits_{}^{}"
